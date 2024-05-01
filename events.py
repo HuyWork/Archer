@@ -30,7 +30,7 @@ class EventHandler():
     def next_stage(self):
         self.stage += 1
         self.enemy_count = 0
-        print("Stage: "  + str(self.stage))
+        # print("Stage: "  + str(self.stage))
         pygame.time.set_timer(self.enemy_generation, 500 - (20 * self.stage)) 
 
     # khởi đầu wave 1, stage = 1

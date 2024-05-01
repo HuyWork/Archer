@@ -7,10 +7,9 @@ from map import Map
 from castle import Castle
 from events import EventHandler
 
-
 #thiết lập màn hình game, không khuyến khích dùng full màn hình vì pygame scale ảnh lên thì chất hơi kém.
 #nếu muốn full màn hình thì thay bằng câu lệnh:
-#displaysurface = pygame.display.set_mode((WIDTH, HEIGHT), flags)
+#displaysurface = pygame.display.set_mode((settings.Screen.WIDTH, settings.Screen.HEIGHT), flags)
 pygame.init()
 FPS_CLOCK = pygame.time.Clock()
 flags = pygame.FULLSCREEN
@@ -148,7 +147,7 @@ class Screen():
                         enemy = Enemy([640, random.randint(50,430)], self.castle.rect, self.handler.stage)
                         self.handler.enemies.append(enemy)
                         self.handler.enemy_count += 1
-                        print(self.handler.enemy_count)
+                        # print(self.handler.enemy_count)
             pygame.display.update()
             FPS_CLOCK.tick(60)
 

@@ -17,10 +17,11 @@ class Player(pygame.sprite.Sprite):
 
     # xác định vị trí và hướng quay của player
     def move(self):
+        print(self.pos, self.rect.x)
         # tính góc quay của player bằng các tính actan của hiệu mouse pos với vị trí của player
         self.mouse_pos = pygame.mouse.get_pos()
         angle = math.atan2(self.mouse_pos[1]-(self.pos[1]+32), self.mouse_pos[0]-(self.pos[0]+26))
-        self.rot = pygame.transform.rotate(self.character, 360-angle*57.29).convert_alpha()
+        self.rot = pygame.transform.rotate(self.character, math.degrees(-angle)).convert_alpha()
         self.newpos = (self.pos[0]-self.rot.get_rect().centerx, self.pos[1]-self.rot.get_rect().centery)
 
         # cập nhật vị trí của player khi trạng thái của key tương ứng là true 
