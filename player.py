@@ -5,72 +5,64 @@ from arrow import Arrow
 
 class Player(pygame.sprite.Sprite):
     # khởi tạo ban đầu của player
-    def __init__(self):
-        super().__init__()
-        self.character = pygame.image.load("resources/images/dude.png").convert_alpha()
-        self.rect = self.character.get_rect()
+    def __init__(self, *groups):
+        super().__init__(*groups)
+        self.original_image = pygame.image.load("resources/images/dude.png").convert_alpha()
+        self.image = self.original_image.copy()
+        self.rect = self.image.get_rect(center=(200, settings.Screen.HEIGHT/2))
 
-        self.angle = 0
-        self.pos = [200, settings.Screen.HEIGHT/2]
-        self.keys = [False, False, False, False]
-        self.arrows = []
+        self.vec = pygame.math.Vector2
+        self.vel = self.vec(0, 0)
+        self.mouse_pos = [0, 0]
+        self.speed = 5
+    
+    # kiểm tra xem có nhấn một trong các nút dưới đây không và cập nhật trạng thái của keys
+    def handle_input(self):
+        keys = pygame.key.get_pressed()
+        self.vel = self.vec(0, 0)
+        if keys[pygame.K_w]:
+            self.vel.y = -self.speed
+        if keys[pygame.K_s]:
+            self.vel.y = self.speed
+        if keys[pygame.K_a]:
+            self.vel.x = -self.speed
+        if keys[pygame.K_d]:
+            self.vel.x = self.speed
 
     # xác định vị trí và hướng quay của player
-    def move(self):
-        print(self.pos, self.rect.x)
-        # tính góc quay của player bằng các tính actan của hiệu mouse pos với vị trí của player
+    # tính góc quay của player bằng các tính actan của hiệu mouse pos với vị trí của player
+    def rotate(self):
         self.mouse_pos = pygame.mouse.get_pos()
-        angle = math.atan2(self.mouse_pos[1]-(self.pos[1]+32), self.mouse_pos[0]-(self.pos[0]+26))
-        self.rot = pygame.transform.rotate(self.character, math.degrees(-angle)).convert_alpha()
-        self.newpos = (self.pos[0]-self.rot.get_rect().centerx, self.pos[1]-self.rot.get_rect().centery)
+        angle = math.atan2(self.mouse_pos[1] - self.rect.centery, self.mouse_pos[0] - self.rect.centerx)
+        rotated_image = pygame.transform.rotate(self.original_image, math.degrees(-angle)).convert_alpha()
+        self.image = rotated_image
+        self.rect = rotated_image.get_rect(center=self.rect.center)
 
-        # cập nhật vị trí của player khi trạng thái của key tương ứng là true 
-        # và không vượt ra màn hình thì tọa độ được cập nhật
-        if self.keys[0] and self.pos[1] > 25:
-            self.pos[1]-=5
-        elif self.keys[2] and self.pos[1] < settings.Screen.HEIGHT - self.character.get_height():
-            self.pos[1]+=5
-        if self.keys[1] and self.pos[0] > 25:
-            self.pos[0]-=5
-        elif self.keys[3] and self.pos[0] < settings.Screen.WIDTH - self.character.get_width():
-            self.pos[0]+=5
+    # cập nhật vị trí của player
+    # và không vượt ra màn hình thì tọa độ được cập nhật
+    def move(self):
+        self.rect.x += self.vel.x
+        self.rect.y += self.vel.y
 
-    # thức hiện cập nhật các trạng thái arrow trong danh sách arrow đã tạo ở phía trên
-    def attack(self, screen):
-        for arrow in self.arrows:
-            arrow.update(screen)
-
-    # render player lên màn hình
-    def render(self, screen):
-        screen.blit(self.rot, self.newpos)
-
-    # kiểm tra xem có nhấn một trong các nút dưới đây không và cập nhật trạng thái của keys
-    def controller(self):
-        pressed_keys = pygame.key.get_pressed()
-        
-        if pressed_keys[K_w]:
-            self.keys[0] = True
-        else: self.keys[0] = False
-        if pressed_keys[K_a]:
-            self.keys[1] = True
-        else: self.keys[1] = False
-        if pressed_keys[K_s]:
-            self.keys[2] = True
-        else: self.keys[2] = False
-        if pressed_keys[K_d]:
-            self.keys[3] = True
-        else: self.keys[3] = False
+        if self.rect.right > settings.Screen.WIDTH:
+            self.rect.right = settings.Screen.WIDTH
+        if self.rect.bottom > settings.Screen.HEIGHT:
+            self.rect.bottom = settings.Screen.HEIGHT
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.top < 0:
+            self.rect.top = 0
     
-    # thêm một đối tựng arrow vào danh sách arrow với các đối số đã nêu ở trên
-    def shoot(self):
-        arrow = Arrow([self.newpos[0]+32, self.newpos[1]+32], math.atan2(self.mouse_pos[1]-(self.newpos[1]+32), self.mouse_pos[0]-(self.newpos[0]+26)))
-        self.arrows.append(arrow)
+    # tạo và thêm đối tượng arrow vào group sprite
+    def shoot(self, *groups):
+        angle = math.atan2(self.mouse_pos[1] - self.rect.centery, self.mouse_pos[0] - self.rect.centerx)
+        Arrow(self.rect, angle, *groups)
+        
 
-    # cập nhật vị trí, góc quay, render player
+    # cập nhật vị trí, góc quay
     # cập nhật danh sách arrow
     # kiểm tra điều khiển của người chơi
-    def update(self, screen):
+    def update(self):
         self.move()
-        self.attack(screen)
-        self.render(screen)
-        self.controller()
+        self.rotate()
+        self.handle_input()

@@ -1,4 +1,6 @@
-from game import Screen
+from game import Game
 
+# khởi chạy game
 if __name__ == "__main__":
-    Screen().main_menu()
+    game = Game()
+    game.menu()
