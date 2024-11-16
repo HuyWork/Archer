@@ -13,6 +13,9 @@ class Preset:
     stage_enemies = [
         [
             [10 , 10, 0, 0],
+            [5, 10, 10, 5],
+            [10, 5, 5, 10],
+            [10, 10, 10, 10]
         ],
         [
             [10 , 0, 0, 10],
@@ -30,7 +33,7 @@ class Preset:
 
     # lưu trữ tốc độ của quái ở mỗi stage trong mỗi level
     speed = [
-        [1],
+        [1, 1, 1, 1],
         [1, 1.5, 1.5, 2],
         [1.5, 2, 2, 2.5]
     ]

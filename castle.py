@@ -15,4 +15,6 @@ class Castle(pygame.sprite.Sprite):
     def update(self):
         if self.hp < Preset.hp_castle // 2:
             self.image = pygame.image.load("resources/images/castle_broken.png").convert_alpha()
+        if self.hp <= 0:
+            self.image = pygame.image.load("resources/images/castle_destroy.png").convert_alpha()
         

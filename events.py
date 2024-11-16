@@ -30,7 +30,11 @@ class GameHandler():
     def spawn_enemy(self, index):
             if self.event.enemy_count[index] < self.event.stage_enemies[self.event.stage - 1][index]:
                 self.event.choice_number(index)
-                Bogey(self.event.enemy_pos[index], Preset.enemy_target[index], self.event.speed[self.event.stage - 1], Preset.diagonal_movement[index], [self.game.game_sprites, self.game.enemies])
+                value = bool(random.randint(0, 1))
+                if value:
+                    Bogey(self.event.enemy_pos[index], Preset.enemy_target[index], self.event.speed[self.event.stage - 1], Preset.diagonal_movement[index], [self.game.game_sprites, self.game.enemies])
+                else:
+                    Snail(self.event.enemy_pos[index], Preset.enemy_target[index], self.event.speed[self.event.stage - 1], Preset.diagonal_movement[index], [self.game.game_sprites, self.game.enemies])
                 self.event.enemy_count[index] += 1
             else: 
                 self.event.stage_state[index] = True
@@ -54,10 +58,14 @@ class GameHandler():
                 self.game.victory()
 
         # kiểm tra và xử lý khi tên bắn vô enemy
-        hits = pygame.sprite.groupcollide(self.game.arrows, self.game.enemies, True, True)
-        for hit in hits:
-            self.game.audio.enemy_damaged.play()
-            self.score += 1
+        for sprite in self.game.enemies.sprites():
+            hits = pygame.sprite.spritecollide(sprite ,self.game.arrows, True)
+            for hit in hits:
+                self.game.audio.enemy_damaged.play()
+                sprite.hp -= 1
+                if sprite.hp == 0:
+                    sprite.kill()
+                    self.score += 1
 
         # kiểm tra và xử lý khi enemy tấn công castle
         hits = pygame.sprite.spritecollide(self.castle, self.game.enemies, True)
